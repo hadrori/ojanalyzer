@@ -1,5 +1,10 @@
 require "ojanalyzer/version"
 
-module Ojanalyzer
-  # Your code goes here...
+class OJAnalyzer
+  def initialize
+    ActiveRecord::Base.establish_connection(
+      adapter: 'sqlite3',
+      database: 'ojanalyzer.db'
+    )
+  end
 end

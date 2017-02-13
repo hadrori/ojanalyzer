@@ -5,7 +5,7 @@ require 'ojanalyzer/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "ojanalyzer"
-  spec.version       = Ojanalyzer::VERSION
+  spec.version       = OJAnalyzer::VERSION
   spec.authors       = ["hadrori"]
   spec.email         = ["hadrori.hs@gmail.com"]
 
