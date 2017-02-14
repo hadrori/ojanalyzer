@@ -22,7 +22,6 @@ chdir APP_ROOT do
 
   puts "\n== Preparing data directory =="
   system('mkdir data')
-  system('mkdir data/code')
 
   puts "\n== Preparing database =="
   OJAnalyzer::Initializer.new.run

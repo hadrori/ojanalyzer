@@ -5,9 +5,10 @@ require 'nokogiri'
 
 class OJAnalyzer::Crawler::AtCoder
   def run
-    # fetch_contests
-    # fetch_submissions
+    fetch_contests
+    fetch_submissions
     fetch_cpp_code
+    puts "====== Finished ======"
   end
 
   def fetch_submissions
@@ -29,6 +30,7 @@ class OJAnalyzer::Crawler::AtCoder
 
   def fetch_cpp_code
     puts "====== Get C++ Code ======"
+    FileUtils.mkdir_p('./data/codes/atcoder') unless Dir.exists?('./data/codes/atcoder')
     AtCoder::Contest.all.each do |contest|
       domain = contest.domain
       puts "contest : #{domain}"
@@ -123,8 +125,8 @@ class OJAnalyzer::Crawler::AtCoder
     code = doc.xpath('//pre[@class="prettyprint linenums"]').first.try(:inner_text)
 
     if code
-      File.open("./codes/atcoder/#{sub.submission_id}.cpp", "w") do |f|
-        f.puts(code)
+      File.open("./data/codes/atcoder/#{sub.submission_id}.cpp", "w") do |f|
+        f.write(code)
       end
     end
   end
