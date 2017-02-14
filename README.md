@@ -1,8 +1,7 @@
 # OJAnalyzer
 
 Online Judge Analyser and Crawler  
-AtCoder用のコードしかないです．
-
+AtCoder用のコードしかないです．AtCoderの提出とかの情報をデータベースに入れて，色々な情報を見たいという要求に答える．
 ## Installation
 
     $ git clone git@github.com:hadrori/ojanalyzer.git
