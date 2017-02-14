@@ -1,2 +1,1 @@
-require 'ojanalyzer/models/atcoder/contest'
-require 'ojanalyzer/models/atcoder/submission'
+Dir[File.dirname(__FILE__) + '/atcoder/*.rb'].each {|file| require file }
