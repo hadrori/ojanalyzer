@@ -1,9 +1,11 @@
 require 'ojanalyzer/version'
 require 'sqlite3'
 require 'active_record'
+require 'ojanalyzer/models/atcoder'
+require 'ojanalyzer/crawler'
 
-class OJAnalyzer
-  def initialize
+module OJAnalyzer
+  def self.establish_databse_connection
     ActiveRecord::Base.establish_connection(
       adapter: 'sqlite3',
       database: 'ojanalyzer.db'

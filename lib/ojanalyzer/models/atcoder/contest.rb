@@ -1,4 +1,5 @@
 class AtCoder::Contest < ActiveRecord::Base
+  self.table_name = :atcoder_contests
   has_many :atcoder_submissions
 
   def contest_submissons

@@ -3,11 +3,12 @@ require 'faraday'
 require 'faraday_middleware'
 require 'nokogiri'
 
-class OJAnalyzer::Crawlers::AtCoder
+class OJAnalyzer::Crawler::AtCoder
   def run
     fetch_contests
-    AtCoder::Contest.all.each do |contest|
-      puts "contest : #{contest.domain}"
+    ::AtCoder::Contest.all.each do |contest|
+      domain = contest.domain
+      puts "contest : #{domain}"
       @conn = Faraday::Connection.new(url: "https://#{domain}.contest.atcoder.jp/submissions/all/") do |f|
         f.use FaradayMiddleware::FollowRedirects
         f.adapter Faraday.default_adapter
@@ -53,7 +54,7 @@ class OJAnalyzer::Crawlers::AtCoder
     subs = Nokogiri::HTML.parse(resp.body).xpath('/html/body/div/div/table/tbody').children.map { |tr|
       next if tr.name != 'tr'
       tds = tr.children.reject { |a| a.name != "td" }
-      sub = Submission.new(
+      sub = AtCoder::Submission.new(
         contest_id: contest.id,
         submission_time: Time.parse(tds[0].children[0].children[0].to_s),
         user_id: user_id(tds),

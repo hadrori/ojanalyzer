@@ -1,8 +1,25 @@
-#!/usr/bin/env bash
-set -euo pipefail
-IFS=$'\n\t'
-set -vx
+#!/usr/bin/env ruby
 
-bundle install
+require 'bundler/setup'
+require 'ojanalyzer'
+require 'pathname'
+require 'fileutils'
+require 'ojanalyzer/initializer'
+include FileUtils
 
-# Do any other automated setup that you need to do here
+# path to your application root.
+APP_ROOT = Pathname.new File.expand_path('../../', __FILE__)
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+chdir APP_ROOT do
+
+  puts '== Installing dependencies =='
+  system! 'gem install bundler --conservative'
+  system('bundle check') || system!('bundle install')
+
+  puts "\n== Preparing database =="
+  OJAnalyzer::Initializer.new.run
+end
