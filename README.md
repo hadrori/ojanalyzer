@@ -1,34 +1,58 @@
-# Ojanalyzer
+# OJAnalyzer
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/ojanalyzer`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Online Judge Analyser and Crawler  
+AtCoder用のコードしかないです．
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'ojanalyzer'
-```
+    $ git clone git@github.com:hadrori/ojanalyzer.git
 
 And then execute:
 
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install ojanalyzer
+    $ cd ojanalyzer
+    $ ./bin/setup
 
 ## Usage
 
-TODO: Write usage instructions here
+Run Console (pry)
 
-## Development
+    $ bin/console
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+### Crawler
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+コンテストの情報と，提出の情報をとってきます．たくさんあるので時間がかかります．
+
+    $ OJAnalyzer::Cralwer::AtCoder.new.run
+
+### Model
+
+#### AtCoder::Contest
+- domain : コンテストのドメイン．abc001みたいな
+- start_at : コンテスト開始時刻
+- finish_at : コンテストの終了時刻
+
+#### AtCoder::Submission
+- contest_id : AtCoder::Contestのidを指します．実際のコンテストとは関係ないです．
+- submission_id : 提出id
+- problem_id : AtCoderでつかわれてる問題のid
+- user_id : 提出者の名前
+- language : 提出言語
+- verdict : 判定
+- submission_time : 提出時刻
+
+### Analyzer
+
+#### Tokenizer
+
+C++のコードを簡単に字句解析をします．スペースの個数もとれます．.9みたいなドットからはじまる数値は面倒だったので対応してません．  
+結果は
+```ruby
+[["int", "reserved"], [" ", "blank"], ["main", "name"], ... ]
+```
+みたいなかんじで，[単語, タグ]のペアの配列が得られます．
+
+#### FeatureExtracter
+C++コードから特徴量をとります．数値の列が得られます．
 
 ## Contributing
 
