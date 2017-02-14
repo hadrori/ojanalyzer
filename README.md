@@ -54,6 +54,11 @@ C++のコードを簡単に字句解析をします．スペースの個数も�
 #### FeatureExtracter
 C++コードから特徴量をとります．数値の列が得られます．
 
+#### AtCoderTwoClassify
+ユーザーを指定して，一定の期間のコードの特徴量をとりだします．また，指定されたユーザー以外のユーザーのコードもランダムに同数だけとりだします．  
+各行の先頭は1か0で，指定されたユーザーであるかどうかを表します．  
+とりだした結果はcsvファイルで吐きだします．
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/hadrori/ojanalyzer.
