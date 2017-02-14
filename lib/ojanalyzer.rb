@@ -3,6 +3,7 @@ require 'sqlite3'
 require 'active_record'
 require 'ojanalyzer/models/atcoder'
 require 'ojanalyzer/crawler'
+Dir[File.dirname(__FILE__) + '/ojanalyzer/analyzers/*.rb'].each {|file| require file }
 
 module OJAnalyzer
   def self.establish_databse_connection
