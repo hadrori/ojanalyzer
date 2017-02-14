@@ -5,47 +5,43 @@ require 'nokogiri'
 
 class OJAnalyzer::Crawler::AtCoder
   def run
-    fetch_contests
-    ::AtCoder::Contest.all.each do |contest|
+    # fetch_contests
+    # fetch_submissions
+    fetch_cpp_code
+  end
+
+  def fetch_submissions
+    puts "====== Get Submission Info ======"
+    AtCoder::Contest.all.each do |contest|
       domain = contest.domain
       puts "contest : #{domain}"
-      @conn = Faraday::Connection.new(url: "https://#{domain}.contest.atcoder.jp/submissions/all/") do |f|
-        f.use FaradayMiddleware::FollowRedirects
-        f.adapter Faraday.default_adapter
-      end
+      base_url = "https://#{domain}.contest.atcoder.jp/submissions/all/"
+      connect(base_url)
+
       600.times do |page|
-        puts "  page : #{page+1}" if page % 100 == 0
-        try_counter = 0
-        begin
-          try_counter += 1
-          fetch_submissions(contest, page+1)
-        rescue Faraday::ConnectionFailed => e
-          p e
-          if try_counter < 10
-            puts "  retry (#{try_counter-1})" 
-            @conn = Faraday::Connection.new(url: "https://#{domain}.contest.atcoder.jp/submissions/all/") do |f|
-              f.use FaradayMiddleware::FollowRedirects
-              f.adapter Faraday.default_adapter
-            end
-            retry
-          end
-        rescue Faraday::TimeoutError => e
-          p e
-          if try_counter < 10
-            puts "  retry (#{try_counter-1})" 
-            @conn = Faraday::Connection.new(url: "https://#{domain}.contest.atcoder.jp/submissions/all/") do |f|
-              f.use FaradayMiddleware::FollowRedirects
-              f.adapter Faraday.default_adapter
-            end
-            retry
-          end
+        puts "  page : #{page}" if page % 100 == 0
+        with_retry(base_url) do
+          fetch_submissions_by_page(contest, page+1)
         end
       end
     end
   end
 
-  def fetch_submissions(contest, page)
-    subs = submissions(@conn.get(page.to_s), contest)
+  def fetch_cpp_code
+    puts "====== Get C++ Code ======"
+    AtCoder::Contest.all.each do |contest|
+      domain = contest.domain
+      puts "contest : #{domain}"
+      contest.submissions.compiled.cpp.each do |sub|
+        with_retry do
+          save_code(sub, domain)
+        end
+      end
+    end
+  end
+
+  def fetch_submissions_by_page(contest, page)
+    subs = submissions(con.get(page.to_s), contest)
     AtCoder::Submission.import subs, validate: false
   end
 
@@ -81,10 +77,8 @@ class OJAnalyzer::Crawler::AtCoder
   end
 
   def fetch_contests
-    con = Faraday::Connection.new(url: 'http://kenkoooo.com/atcoder/json/') do |f|
-      f.use FaradayMiddleware::FollowRedirects
-      f.adapter Faraday.default_adapter
-    end
+    puts "====== Update Contest Info ======"
+    connect('http://kenkoooo.com/atcoder/json/')
 
     resp_hash = JSON.parse(con.get('contests.json').body)
     resp_hash.each do |contest|
@@ -99,6 +93,17 @@ class OJAnalyzer::Crawler::AtCoder
 
   private
 
+  def connect(url)
+    @con = Faraday::Connection.new(url: url) do |f|
+      f.use FaradayMiddleware::FollowRedirects
+      f.adapter Faraday.default_adapter
+    end
+  end
+
+  def con
+    @con
+  end
+
   def submission_id(pos, tds)
     tds[pos].children[1].attributes["href"].value.scan(/\/submissions\/(.*)/).flatten.first.to_i
   end
@@ -109,5 +114,40 @@ class OJAnalyzer::Crawler::AtCoder
 
   def user_id(tds)
     tds[2].children[0].attributes["href"].value.scan(/https:\/\/atcoder.jp\/user\/(.*)/).flatten.first
+  end
+
+  def save_code(sub, domain)
+    connect("https://#{domain}.contest.atcoder.jp/submissions")
+
+    doc = Nokogiri::HTML.parse(con.get("#{sub.submission_id}").body, nil, nil)
+    code = doc.xpath('//pre[@class="prettyprint linenums"]').first.try(:inner_text)
+
+    if code
+      File.open("./codes/atcoder/#{sub.submission_id}.cpp", "w") do |f|
+        f.puts(code)
+      end
+    end
+  end
+
+  def with_retry(url = nil)
+    try_counter = 0
+    begin
+      try_counter += 1
+      yield
+    rescue Faraday::ConnectionFailed => e
+      p e
+      if try_counter < 10
+        puts "  retry (#{try_counter-1})"
+        connect(url) if url
+        retry
+      end
+    rescue Faraday::TimeoutError => e
+      p e
+      if try_counter < 10
+        puts "  retry (#{try_counter-1})" 
+        connect(url) if url
+        retry
+      end
+    end
   end
 end

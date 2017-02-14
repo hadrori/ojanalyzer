@@ -10,9 +10,9 @@ class OJAnalyzer::Initializer
   end
 
   def drop_database
-    if File.exist?('ojanalyzer.db')
+    if File.exist?('data/ojanalyzer.db')
       puts "-- delete database"
-      File.delete('ojanalyzer.db')
+      File.delete('data/ojanalyzer.db')
     end
   end
 
@@ -20,7 +20,7 @@ class OJAnalyzer::Initializer
     puts "-- create database"
     ActiveRecord::Base.establish_connection(
       adapter: 'sqlite3',
-      database: 'ojanalyzer.db'
+      database: 'data/ojanalyzer.db'
     )
   end
 

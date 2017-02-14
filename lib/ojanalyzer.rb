@@ -8,7 +8,7 @@ module OJAnalyzer
   def self.establish_databse_connection
     ActiveRecord::Base.establish_connection(
       adapter: 'sqlite3',
-      database: 'ojanalyzer.db'
+      database: 'data/ojanalyzer.db'
     )
   end
 end
